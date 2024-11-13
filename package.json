@@ -9,6 +9,9 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@fortawesome/free-regular-svg-icons": "^6.6.0",
+    "@fortawesome/react-native-fontawesome": "^0.3.2",
+    "caffagram-mobile": "file:",
     "expo": "~51.0.28",
     "expo-status-bar": "~1.12.1",
     "react": "18.2.0",
