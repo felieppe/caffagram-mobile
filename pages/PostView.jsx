@@ -1,141 +1,152 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { fetchAllProfiles, fetchFeed, fetchProfileById } from "@/utils/api";
+import ProfileHeader from "../components/ProfileHeader";
+import EditProfileButton from "../components/EditProfileButton";
+import BottomHeader from "../components/BottomHeader";
+import PhotoGallery from "../components/PhotoGallery";
+import TopHeaderProfile from "@/components/TopHeaderProfile";
+import EditProfilePage from "../components/EditProfilePage";
+import { useEffect, useState } from "react";
 
-const PostView = () => {
-  const profilePicture = 'https://example.com/zarasa.jpg';
-  const post = {
-    user: {
-      username: 'Zarasa del Sabor',
-      profilePicture: 'https://example.com/zarasa.jpg',
-    },
-    imageUrl: 'https://example.com/zarasa.jpg',
-    likes: ['1', '2'],
-    comments: [
-      { _id: '1', user: { username: 'Luciano' }, text: 'Tremenda foto!' },
-      { _id: '2', user: { username: 'Alfredo' }, text: 'Tremenda pilcha Loco!' },
-    ],
-  };
+function User({ user = {}, jwt = "" }) {
+    const [isEditing, setIsEditing] = useState(false);
+    const [posts, setPosts] = useState([]);
+    const [isOp, setIsOp] = useState(false);
+    const [lUser, setLUser] = useState(null);
 
-  const [newComment, setNewComment] = useState('');
-  const [error, setError] = useState('');
+    const handleEditProfile = () => setIsEditing(true);
+    const handleCancelEdit = () => setIsEditing(false);
 
-  const handleLike = () => {
-    console.log(`Liked post by user`);
-  };
+    const handleSaveProfile = (updatedProfile) => {
+        setProfile(updatedProfile);
+        setIsEditing(false);
+    };
 
-  const handleComment = async () => {
-    if (!newComment) {
-      setError('El comentario no puede estar vacío');
-      return;
+    useEffect(() => {
+        fetchFeed(jwt)
+            .then((feed) => {
+                const up = feed
+                    .filter((post) => post.user.username === user.username)
+                    .map((post) => ({
+                        imageUrl: "http://localhost:3001/" + post.imageUrl,
+                        id: post._id,
+                    }));
+                setPosts(up);
+            })
+            .catch((error) => console.error(error));
+
+        const localUser = JSON.parse(localStorage.getItem("user"));
+        setLUser(localUser);
+
+        if (localUser == null) {
+            setIsOp(false);
+        } else if (localUser.username === user.username) {
+            setIsOp(true);
+        }
+    }, [user, jwt]);
+
+    if (!lUser) {
+        return <div>Loading...</div>;
     }
-    try {
-      const jwt = "tu_token_jwt";
-      setNewComment('');
-      setError('');
-    } catch (error) {
-      console.error("Error al agregar comentario:", error);
-      setError('Error al agregar el comentario. Intenta nuevamente.');
+
+    return (
+        <>
+            <div
+                style={{
+                    padding: "10px",
+                    maxWidth: "480px",
+                    margin: "0 auto",
+                    fontFamily: "Arial, sans-serif",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "16px",
+                }}
+            >
+                {isEditing ? (
+                    <EditProfilePage
+                        profileData={user}
+                        onSave={handleSaveProfile}
+                        onCancel={handleCancelEdit}
+                    />
+                ) : null}
+
+                <TopHeaderProfile />
+
+                <ProfileHeader
+                    username={user.username}
+                    profilePicture={
+                        user.profilePicture
+                            ? user.profilePicture
+                            : "/default-profile.webp"
+                    }
+                    posts={posts.length}
+                    friends={user.friends.length}
+                    description={user.description}
+                    onEdit={handleEditProfile}
+                />
+
+                {isOp && (
+                    <EditProfileButton
+                        onEdit={handleEditProfile}
+                        style={{
+                            margin: "0 auto",
+                            width: "80%",
+                            padding: "8px 16px",
+                            borderRadius: "8px",
+                            fontSize: "14px",
+                        }}
+                    />
+                )}
+
+                {posts.length > 0 ? (
+                    <PhotoGallery photos={posts} />
+                ) : (
+                    <p
+                        style={{
+                            width: "100%",
+                            textAlign: "center",
+                            color: "#808080",
+                            marginTop: "16px",
+                        }}
+                    >
+                        No posts yet
+                    </p>
+                )}
+
+                <BottomHeader
+                    profileImageUrl={
+                        fetchProfileById(lUser.id, jwt).profilePicture || ""
+                    }
+                />
+            </div>
+        </>
+    );
+}
+
+export default User;
+
+export async function getServerSideProps(context) {
+    const { username } = context.query;
+    if (!username) {
+        return {
+            redirect: { destination: "/feed", permanent: false },
+        };
     }
-  };
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Image source={{ uri: post.user.profilePicture }} style={styles.profilePic} />
-        <Text style={styles.username}>@{post.user.username}</Text>
-      </View>
+    const jwt = context.req.cookies.token;
+    if (!jwt) {
+        return {
+            redirect: { destination: "/Login", permanent: false },
+        };
+    }
 
-      <Image source={{ uri: post.imageUrl }} style={styles.postImage} />
+    const user = await fetchAllProfiles(jwt).then((profiles) =>
+        profiles.find((profile) => profile.username === username)
+    );
+    if (!user) {
+        return {
+            redirect: { destination: "/feed", permanent: false },
+        };
+    }
 
-      <View style={styles.actions}>
-        <TouchableOpacity onPress={handleLike}>
-          <Text style={post.likes.includes('user_id') ? styles.liked : styles.unliked}>❤️</Text>
-        </TouchableOpacity>
-        <Text>{post.likes.length} Likes</Text>
-      </View>
-
-      <View style={styles.comments}>
-        {post.comments.map(comment => (
-          <View key={comment._id} style={styles.comment}>
-            <Text style={styles.commentUsername}>{comment.user.username}</Text>
-            <Text>{comment.text}</Text>
-          </View>
-        ))}
-      </View>
-
-      <TextInput
-        style={styles.input}
-        value={newComment}
-        onChangeText={setNewComment}
-        placeholder="Escribe un comentario..."
-      />
-      <Button title="Comentar" onPress={handleComment} />
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 15,
-    backgroundColor: '#fff',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  profilePic: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-  },
-  username: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginLeft: 10,
-  },
-  postImage: {
-    width: '100%',
-    height: 300,
-    marginVertical: 10,
-  },
-  actions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  liked: {
-    fontSize: 20,
-    color: 'red',
-  },
-  unliked: {
-    fontSize: 20,
-    color: 'grey',
-  },
-  comments: {
-    marginTop: 10,
-  },
-  comment: {
-    flexDirection: 'row',
-    marginVertical: 5,
-  },
-  commentUsername: {
-    fontWeight: 'bold',
-    marginRight: 5,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    padding: 10,
-    marginTop: 10,
-    marginBottom: 10,
-  },
-  error: {
-    color: 'red',
-    marginTop: 5,
-  },
-});
-
-export default PostView;
+    return { props: { user, jwt } };
+}
