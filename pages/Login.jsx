@@ -2,12 +2,15 @@ import React, { useEffect, useState, useContext } from "react";
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import UserContext from "../UserContext"; 
+import { login } from "../utils/api";
 
 function Login({ navigation }) {
   const [error, setError] = useState('');
   const { setUser } = useContext(UserContext);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const validateForm = (email, password) => {
+  const validateForm = () => {
     if (!email || !password) {
       setError('Por favor, completa todos los campos');
       return false;
@@ -24,30 +27,29 @@ function Login({ navigation }) {
     return true;
   };
 
-  const handleSubmit = async () => {
-    const email = "caffa@example.com"; 
-    const password = "password123"; 
+  function handleSubmit(e){
+    if (!validateForm()) return alert(error);
+    e.preventDefault();
 
-    if (!validateForm(email, password)) return Alert.alert(error);
+    login(email, password).then((res) => {
+      if (res.error) {
+        setError(res.error);
+        return alert(error)
+      } else {
+        let {_id, username, token } = res
 
-    try {
-      const res = { _id: "1", username: "testuser", token: "fakeToken123" };
+        AsyncStorage.setItem('token', token).then((_) => {
+          setUser({ _id, username, token });
+          navigation.navigate('Home');
+        });
 
-      const { _id, username, token } = res;
-      await AsyncStorage.setItem('token', token);
-      setUser({ id: _id, username, token });
-      navigation.navigate('Home'); 
-    } catch (error) {
-      console.error(error);
-    }
-  };
+      }}).catch((error) => {console.error(error)})
+  }
 
   useEffect(() => {
     const checkToken = async () => {
       const token = await AsyncStorage.getItem('token');
-      if (token) {
-        navigation.navigate('Home'); 
-      }
+      if (token) { navigation.navigate('Home');  }
     };
     checkToken();
   }, []);
@@ -59,11 +61,15 @@ function Login({ navigation }) {
         <TextInput
           placeholder="email"
           style={styles.loginInput}
+          value={email}
+          onChangeText={setEmail}
           keyboardType="email-address"
           autoCapitalize="none"
         />
         <TextInput
           placeholder="password"
+          value={password}
+          onChangeText={setPassword}
           style={styles.loginInput}
           secureTextEntry
         />
