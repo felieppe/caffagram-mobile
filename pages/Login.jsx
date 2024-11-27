@@ -39,7 +39,8 @@ function Login({ navigation }) {
         let {_id, username, token } = res
 
         AsyncStorage.setItem('token', token).then((_) => {
-          setUser({ _id, username, token });
+          // setUser({ _id, username, token });
+          AsyncStorage.setItem('user', JSON.stringify({ _id, username, token }))
           navigation.navigate('Home');
         });
 
