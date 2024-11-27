@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, FlatList, StyleSheet } from 'react-native';
-import { fetchProfileById } from '@/utils/api';
-import TopHeader from '@/components/TopHeader';
-import LeftNavbar from '@/components/menus/LeftNavbar';
+import { fetchProfileById } from '../utils/api';
+import TopHeader from '../components/TopHeader';
 
 function ProfileFriends({ user = {}, jwt = '' }) {
     const [friends, setFriends] = useState([]);
@@ -24,7 +23,6 @@ function ProfileFriends({ user = {}, jwt = '' }) {
             <TopHeader />
 
             <View style={styles.container}>
-                <LeftNavbar user={user} actual={"FRIENDS"} />
 
                 <View style={styles.friends}>
                     <View style={styles.friendsUser}>

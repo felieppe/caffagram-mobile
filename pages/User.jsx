@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, Button, FlatList, StyleSheet } from 'react-native';
-import { addFriendById, editMyProfile, fetchAllProfiles, fetchFeed, fetchProfileById, removeFriendById } from '@/utils/api';
-import TopHeader from '@/components/TopHeader';
-import BottomHeader from '@/components/BottomHeader';
-import EditProfileButton from '@/components/EditProfileButton';
-import EditProfilePage from '@/components/EditProfilePage';
-import PhotoGallery from '@/components/PhotoGallery';
-import ProfileHeader from '@/components/ProfileHeader';
+import { addFriendById, editMyProfile, fetchAllProfiles, fetchFeed, fetchProfileById, removeFriendById } from '../utils/api';
+import TopHeader from '../components/TopHeader';
+import BottomHeader from '../components/BottomHeader';
+import EditProfileButton from '../components/EditProfileButton';
+import EditProfilePage from '../components/EditProfilePage';
+import PhotoGallery from '../components/PhotoGallery';
+import ProfileHeader from '../components/ProfileHeader';
 
 function User({ user = {}, jwt = '' }) {
     const [isEditing, setIsEditing] = useState(false);
