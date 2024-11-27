@@ -88,7 +88,7 @@ export default function Home({ navigation }) {
           {posts.map(post => (
             <View key={post._id} style={styles.post}>
               <View style={styles.post__top}>
-                <TouchableOpacity style={styles.post__top__user}> 
+                <TouchableOpacity style={styles.post__top__user} onPress={() => { navigation.navigate("User", { user: post.user, jwt: jwt }) }}> 
                   <Image 
                     // source={{ uri: post.user.profilePicture || '/default-profile.webp' }}
                     source={ post.user.profilePicture && post.user.profilePicture != "/default-profile.webp" ? { uri: post.user.profilePicture } : require('../public/default-profile.webp') }

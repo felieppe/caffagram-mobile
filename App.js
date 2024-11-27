@@ -8,6 +8,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import UserContext from './UserContext';
 import Register from './pages/Register';
+import User from './pages/User';
 
 const Stack = createStackNavigator();
 
@@ -21,6 +22,7 @@ export default function App() {
           <Stack.Screen name="Home" component={Home} />
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="Register" component={Register} />
+          <Stack.Screen name="User" component={User} />
         </Stack.Navigator>
       </NavigationContainer>
     </UserContext.Provider>
