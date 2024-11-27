@@ -77,7 +77,7 @@ export default function Home({ navigation }) {
   }, [user])
 
   if (!user) { return <View><Text>Loading...</Text></View>; }
-  if (jwt) { navigation.navigate('Login'); }
+  if (!jwt) { navigation.navigate('Login'); }
 
   return (
     <View style={styles.container}>

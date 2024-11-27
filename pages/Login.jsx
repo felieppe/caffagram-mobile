@@ -50,7 +50,7 @@ function Login({ navigation }) {
   useEffect(() => {
     const checkToken = async () => {
       const token = await AsyncStorage.getItem('token');
-      if (token) { navigation.navigate('Home');  }
+      if (!token) { navigation.navigate('Home');  }
     };
     checkToken();
   }, []);
