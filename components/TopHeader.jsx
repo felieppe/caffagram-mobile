@@ -17,7 +17,7 @@ function TopHeader() {
     return (
         <View style={styles.topHeader}>
             <TouchableOpacity onPress={() => {}}>
-                <Image source={require('../assets/image.jpg')} style={styles.logo} />
+                <Image source={require('../public/logo.png')} style={styles.logo} />
             </TouchableOpacity>
             <View style={styles.buttonGroup}>
                 <TouchableOpacity style={styles.likeButton}>
@@ -41,9 +41,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
     },
     logo: {
-        width: 40,
-        height: 40,
-        borderRadius: 50
+        width: 120,
+        height: 30
     },
     buttonGroup: {
         flexDirection: 'row',
