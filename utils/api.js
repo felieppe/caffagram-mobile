@@ -7,7 +7,7 @@
 
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:3001/api';
+const BASE_URL = 'http://10.0.0.29:3001/api';
 
 /**
  * @function register

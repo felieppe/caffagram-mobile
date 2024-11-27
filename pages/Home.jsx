@@ -103,7 +103,7 @@ export default function Home({ navigation }) {
               </View> 
 
               <Image 
-                source={{ uri: "http://192.168.0.27:3001/" + (post.imageUrl).replace("\\", '/') }} 
+                source={{ uri: "http://10.0.0.29:3001/" + (post.imageUrl).replace("\\", '/') }} 
                 style={styles.post__image}
                 resizeMode='contain'
                 onError={(error) => { console.error("Image load error:", error) }}
