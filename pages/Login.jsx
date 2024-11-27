@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import UserContext from "../UserContext"; 
 import { login } from "../utils/api";
@@ -76,9 +76,11 @@ function Login({ navigation }) {
         />
         <Button title="Login" onPress={handleSubmit} />
       </View>
-      <Text style={styles.signupText}>
-        Create account <Text style={styles.signupLink}>here</Text>
-      </Text>
+      <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+        <Text style={styles.signupText}>
+          Create account <Text style={styles.signupLink}>here</Text>
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }
